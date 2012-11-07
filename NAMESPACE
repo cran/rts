@@ -1,0 +1,4 @@
+importFrom("xts", endpoints,period.apply,apply.daily,apply.weekly,apply.monthly,apply.quarterly,apply.yearly)
+importFrom("raster",extract,subset,cellFromRowCol,cellFromXY)
+exportClasses(rts, RasterBrickTS, RasterStackTS, RasterStackBrickTS)
+exportPattern("^[[:alpha:]]+")
