@@ -1,7 +1,7 @@
 # Author: Babak Naimi, naimi.b@gmail.com
 # This is based on 'show' function from raster package 
-# Date :  July 2012
-# Version 1.0
+# Date :  November 2012
+# Version 1.1
 # Licence GPL v3
 
 setMethod ('show' , 'RasterStackBrickTS',
@@ -11,10 +11,7 @@ setMethod ('show' , 'RasterStackBrickTS',
                cat ('Raster Time Series with',p$scale, 'periodicity from',as.character(p$start),'to',as.character(p$end),'\n')
              } 
              cat ('class       :' , class ( object ) , '\n')
-             if (rotated(object)) {
-               cat('rotated     : TRUE\n')
-             }
-             
+                          
              if (filename(object@raster) != '') {
                cat ('raster filename    :' , filename(object@raster), '\n')
              }

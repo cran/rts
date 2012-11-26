@@ -1,4 +1,4 @@
-053b68174516dd6ab0951c6dc300b78d *DESCRIPTION
+b81d4d18803bdcfbe299cdb6c875dd74 *DESCRIPTION
 e90d2dcf5b58bf3a259272a9237e2684 *NAMESPACE
 c7b4aecef30baefc5dff1ddcb5124130 *R/AAAClasses.R
 f83417f9f59b03346df2f7cf63d51655 *R/apply.R
@@ -9,7 +9,7 @@ d5e9bafb1274f3d7898df3c2afc8a970 *R/index.R
 1c571228e61ea78ec560eed7a9f3ab9c *R/period.R
 fcde31c3aeb888a91c0df0f726bb2bdf *R/plot.R
 198c14d3600f86abb1550d873d2a42a1 *R/rts.R
-51af6ca98a6704b363da1dccfc94ab77 *R/show.R
+3d9ac275337c518d04952eb68a89b4ba *R/show.R
 9587935fd8f93df9c1691cf28914a7a7 *R/subset.R
 40947af48cffa4631710eca8aae311f9 *R/writerts.R
 05ec22f32f1b914cd9050dc5115c2123 *inst/external/ModisLP.RData
