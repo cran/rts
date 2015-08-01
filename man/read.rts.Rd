@@ -28,7 +28,7 @@ This function reads a raster time series object which has been writen by \code{\
 
 \author{Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

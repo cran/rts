@@ -1,8 +1,7 @@
 # Author: Babak Naimi, naimi.b@gmail.com
-# Date :  Nov. 2012
-# Version 1.0
+# Date :  July. 2015
+# Version 1.1
 # Licence GPL v3
-
 
 
 if (!isGeneric("plot")) {
@@ -12,7 +11,7 @@ if (!isGeneric("plot")) {
 
 
 
-setMethod("plot", signature(x='rts'),
+setMethod("plot", signature(x='rts',y='ANY'),
           function(x,y,col,main,ylim,...) {
             # part of this function is copied from plot.xts in xts package
             if(nrow(x) < 2) stop("Number of observations should be greater than 1")
@@ -25,7 +24,7 @@ setMethod("plot", signature(x='rts'),
             } else if (length(col) != length(y)) col <- rep(col[1],length(y))
             if (missing(ylim)) ylim <- c(min(x[,y],na.rm=TRUE),max(x[,y],na.rm=TRUE))
             
-            ep <- axTicksByTime(x, "auto", format = TRUE)
+            ep <- axTicksByTime(x, "auto", format.labels = TRUE)
             xycoords <- xy.coords(index(x), x[, y[1]])
             plot(xycoords$x, xycoords$y, type = 'l', axes = FALSE, ann = FALSE, col=col[1], ylim=ylim, ...)
             abline(v = xycoords$x[ep], col = "grey", lty = 4)
@@ -40,10 +39,10 @@ setMethod("plot", signature(x='rts'),
 )
 
 
-setMethod("plot", signature(x='RasterStackBrickTS'),
+setMethod("plot", signature(x='RasterStackBrickTS','ANY'),
           function(x, y,...) {
             if (missing(y)) y <- as.vector(x@time)
-            if (!inherits(try(i <- x@time[y],T), "try-error")) {
+            if (!inherits(try(i <- x@time[y],TRUE), "try-error")) {
               if (length(i) > 0) {
                 y <- as.vector(i)
               } else {
@@ -54,8 +53,7 @@ setMethod("plot", signature(x='RasterStackBrickTS'),
               warning("No raster is returned for specified time range, y is ignored!")
               y <- as.vector(x@time)
             }
-            n <- rep(NA,nlayers(x@raster))
-            n[y] <- as.character(index(x@time))[y]
-            plot(x=x@raster,y=y,main=n, ...)
+            n <- as.character(index(x@time))[y]
+            plot(x=x@raster,y=y,main=n,...)
           }
 )

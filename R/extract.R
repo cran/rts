@@ -1,6 +1,6 @@
 # Author: Babak Naimi, naimi.b@gmail.com
-# Date :  July 2012
-# Version 1.0
+# Date :  July 2015
+# Version 1.1
 # Licence GPL v3
 
 
@@ -15,7 +15,7 @@ setMethod("[", c("RasterStackBrickTS", "Spatial","ANY"),
                   } else {
                     x <- x@raster[[as.vector(j)]][i,drop=drop]
                     if (length(j) == 1) {
-                      layerNames(x) <- as.character(index(j))
+                      names(x) <- as.character(index(j))
                       x
                     }
                     else rts(x,index(j))  
@@ -47,7 +47,7 @@ setMethod("[", c("RasterStackBrickTS", "numeric","ANY"),
                   } else {
                     x <- .doExtract(x@raster[[as.vector(j)]],i,drop=drop)
                     if (length(j) == 1) {
-                      layerNames(x) <- as.character(index(j))
+                      names(x) <- as.character(index(j))
                       x
                     }
                     else rts(x,index(j))  

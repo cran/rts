@@ -37,7 +37,7 @@ RasterStackTS or RasterBrickTS
 \author{
 Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

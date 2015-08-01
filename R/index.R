@@ -4,6 +4,7 @@
 # Licence GPL v3
 
 
+
 `index.RasterStackBrickTS` <- function(x,...){
   index(x@time,...)
 }
@@ -11,3 +12,5 @@
 `index<-.RasterStackBrickTS` <- function(x,value){
   index(x@time) <- value
 }
+
+

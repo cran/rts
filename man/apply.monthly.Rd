@@ -41,7 +41,7 @@ A raster time series (\code{Raster*TS}) object
 
 \author{Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

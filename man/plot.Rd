@@ -5,7 +5,8 @@
 \alias{plot}
 \alias{plot,RasterStackBrickTS-method}
 \alias{plot,rts-method}
-
+\alias{plot,RasterStackBrickTS,ANY-method}
+\alias{plot,rts,ANY-method}
 
 \title{Plot raster time series}
 
@@ -14,8 +15,8 @@ Plot raster layers corresponding to specified times, or plot extracted time-seri
 
 \usage{
 
-\S4method{plot}{RasterStackBrickTS}(x, y, ...)
-\S4method{plot}{rts}(x, y, ...)
+\S4method{plot}{RasterStackBrickTS,ANY}(x, y, ...)
+\S4method{plot}{rts,ANY}(x, y, ...)
 
 }
 
@@ -48,7 +49,7 @@ CCYYMMDD HH:MM:SS.ss+/CCYYMMDD HH:MM:SS.ss
 
 \author{Babak Naimi 
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

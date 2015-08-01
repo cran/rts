@@ -40,7 +40,7 @@ A numeric vector of endpoints beginning with 0 and ending with a value equal to 
 
 \author{Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

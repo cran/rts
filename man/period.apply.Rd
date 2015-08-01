@@ -30,7 +30,7 @@ RasterStackTS or RasterBrickTS
 
 \author{Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }
@@ -38,7 +38,29 @@ RasterStackTS or RasterBrickTS
 \seealso{ \code{\link[xts]{period.apply}}}
 
 \examples{
-period.apply
+file <- system.file("external/ndvi", package="rts")
+
+ndvi <- rts(file) # read the ndvi time series from the specified file
+
+ndvi
+
+ep <- endpoints(ndvi,'years') # extract the end index on each year period
+
+ndvi.y <- period.apply(ndvi,ep,mean) # apply the mean function on each year
+
+ndvi.y
+
+#---------
+ep <- endpoints(ndvi,'quarters') # extract the end index on each quarter of a year
+
+# a function:
+f <- function(x) {
+  if (min(x) > 0.5) mean(x)
+  else 0
+}
+
+ndvi.q <- period.apply(ndvi,ep,f) # apply the function f on each quarter
+
 }
 
 \keyword{ utilities }

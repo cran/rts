@@ -33,7 +33,7 @@ This function can be used to extract a raster layer or a set of raster lasyers b
 
 \author{Babak Naimi
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

@@ -34,7 +34,9 @@ This function is used for writing values to a series of files.
 }
 
 \author{Babak Naimi
-\email{naimi@r-gis.net}
+
+\email{naimi.b@gmail.com}
+
 \url{http://r-gis.net}
 }
 

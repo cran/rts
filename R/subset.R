@@ -1,6 +1,6 @@
 # Author: Babak Naimi, naimi.b@gmail.com
-# Date :  July 2012
-# Version 1.0
+# Date :  July 2015
+# Version 1.1
 # Licence GPL v3
 
 setMethod("[[", c("RasterStackBrickTS","ANY","ANY"),
@@ -12,7 +12,7 @@ setMethod("[[", c("RasterStackBrickTS","ANY","ANY"),
               } else {
                 if (length(i) == 1) {
                   x <- subset(x@raster,as.vector(i),drop=drop,...)
-                  layerNames(x) <- as.character(index(i))
+                  names(x) <- as.character(index(i))
                   x
                 } else stop("There is no data for specified time range!")
               }

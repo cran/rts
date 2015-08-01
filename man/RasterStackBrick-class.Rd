@@ -35,7 +35,7 @@ See also \code{\link[raster]{Raster-class}} for slots in \code{raster}.
 
 \author{Babak Naimi 
 
-\email{naimi@r-gis.net}
+\email{naimi.b@gmail.com}
 
 \url{http://r-gis.net}
 }

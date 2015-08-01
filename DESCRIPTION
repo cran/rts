@@ -1,20 +1,19 @@
 Package: rts
 Type: Package
-Title: Raster time series analysis
-Version: 1.0-3
-Date: 2012-11-26
+Title: Raster Time Series Analysis
+Version: 1.0-9
+Date: 2015-08-01
 Author: Babak Naimi
-Depends: methods, raster, xts, zoo (>= 1.7-2)
-Suggests: rgdal (>= 0.6-28)
-Maintainer: Babak Naimi <naimi@r-gis.net>
-Description: This package aims to provide classes and methods for
-        manipulating and processing of raster time series data (e.g. a
-        time series of satellite images).
+Depends: methods, sp (>= 1.0-13), raster, xts, zoo
+Suggests: rgdal, RCurl
+Maintainer: Babak Naimi <naimi.b@gmail.com>
+Description: This framework aims to provide classes and methods for manipulating and processing of raster time series data (e.g. a time series of satellite images).
 License: GPL (>= 3)
 URL: http://r-gis.net
 Repository: CRAN
 Repository/R-Forge/Project: rts
-Repository/R-Forge/Revision: 5
-Repository/R-Forge/DateTimeStamp: 2012-11-26 00:59:24
-Date/Publication: 2012-11-26 12:50:50
-Packaged: 2012-11-26 03:19:48 UTC; rforge
+Repository/R-Forge/Revision: 13
+Repository/R-Forge/DateTimeStamp: 2015-08-02 00:11:44
+Date/Publication: 2015-08-02 08:23:21
+NeedsCompilation: no
+Packaged: 2015-08-02 00:25:11 UTC; rforge
