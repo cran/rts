@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 4.1, July 2015
+# Version: 4.2, Augues 2015
 # Author: Babak Naimi (naimi.b@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -53,7 +53,7 @@ modisProducts <- function() {
         if (length(w) > 0) v <- unlist(lapply(strsplit(dirs,'\\.'),function(x) x[[2]]))[w]
         x <- paste("http://e4ftl01.cr.usgs.gov/",ad,"/",x,".",v,"/",sep="")
       }
-    }
+    } else x <- xx
   }
   x
 }

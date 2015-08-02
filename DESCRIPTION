@@ -1,8 +1,8 @@
 Package: rts
 Type: Package
 Title: Raster Time Series Analysis
-Version: 1.0-9
-Date: 2015-08-01
+Version: 1.0-10
+Date: 2015-08-02
 Author: Babak Naimi
 Depends: methods, sp (>= 1.0-13), raster, xts, zoo
 Suggests: rgdal, RCurl
@@ -12,8 +12,8 @@ License: GPL (>= 3)
 URL: http://r-gis.net
 Repository: CRAN
 Repository/R-Forge/Project: rts
-Repository/R-Forge/Revision: 13
-Repository/R-Forge/DateTimeStamp: 2015-08-02 00:11:44
-Date/Publication: 2015-08-02 08:23:21
+Repository/R-Forge/Revision: 14
+Repository/R-Forge/DateTimeStamp: 2015-08-02 21:58:19
+Date/Publication: 2015-08-03 19:08:25
 NeedsCompilation: no
-Packaged: 2015-08-02 00:25:11 UTC; rforge
+Packaged: 2015-08-02 22:20:11 UTC; rforge
