@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 4.2, Augues 2015
+# Version: 4.3, June 2016
 # Author: Babak Naimi (naimi.b@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -77,7 +77,7 @@ modisProducts <- function() {
       if (ce == (try.nr+1)) stop("Download error: Server does not response!")
     }
   }
-  items <- items[-c(1:19)]
+  items <- items[-1]
   # get the directory names (available dates)
   dirs <- unlist(lapply(strsplit(unlist(lapply(strsplit(items,'href'),function(x){strsplit(x[2],'/')[[1]][1]})),'"'),function(x) {x[2]}))
   dirs <- na.omit(dirs)
