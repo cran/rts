@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 4.3, June 2016
+# Version: 4.4, June 2016
 # Author: Babak Naimi (naimi.b@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -106,24 +106,32 @@ modisProducts <- function() {
         if (ce == (try.nr+1)) stop("Download error: Server does not response!")
       }
     }
-    getlist <- getlist[-c(1:19)]
+    #getlist <- getlist[-c(1:7)]
     getlist <- unlist(lapply(strsplit(getlist,"href"),function(x){strsplit(x[2],'"')[[1]][2]}))
     w <- which(is.na(getlist))
     if (length(w) > 0) getlist <- getlist[-w]
-    m <- c()
-    for (vv in v) {
-      for (hh in h) {
-        if (vv < 10) vc <- paste('0',as.character(vv),sep='')
-        else vc <- as.character(vv)
-        if (hh < 10) hc <- paste('0',as.character(hh),sep='')
-        else hc <- as.character(hh)
-        ModisName <- grep(".hdf$",grep(paste('h',hc,'v',vc,sep=''),getlist,value=TRUE),value=TRUE)
-        #if (length(ModisName) == 1) {
+    w <- unlist(lapply(lapply(getlist,function(x) strsplit(x,'\\.')[[1]]),function(x) x[length(x)] == 'hdf'))
+    if (any(w)) getlist <- getlist[w]
+    
+    if (length(grep('h[0-9]',getlist)) > 0) {
+      m <- c()
+      for (vv in v) {
+        for (hh in h) {
+          if (vv < 10) vc <- paste('0',as.character(vv),sep='')
+          else vc <- as.character(vv)
+          if (hh < 10) hc <- paste('0',as.character(hh),sep='')
+          else hc <- as.character(hh)
+          ModisName <- grep(".hdf$",grep(paste('h',hc,'v',vc,sep=''),getlist,value=TRUE),value=TRUE)
+          #if (length(ModisName) == 1) {
           m <- c(m,paste(x,dirs[i], "/",ModisName,sep='')[length(ModisName)])
           Modislist[[dirs[i]]] <- m
-        #}
+          #}
+        }
       }
+    } else {
+      Modislist[[dirs[i]]] <- getlist
     }
+    
   }
   Modislist
 }
