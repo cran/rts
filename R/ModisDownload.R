@@ -1,9 +1,11 @@
 # Title:  ModisDownload 
-# Version: 4.4, June 2016
+# Version: 5.2 (last update): Nov. 2016
 # Author: Babak Naimi (naimi.b@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
 # the functions have been adjusted to support HTTP!
+
+# From ver 5.0, a major change is made that is to support authentication required by the main website
 
 # (Thanks Tomislav Hengl as his script [spatial-analyst.net] was used as the main core of the first version)
 # Description: This is the source for two functions (ModisDownload and MRTproj) in R language that assist you to download, mosaic, subset and reproject the MODIS image products.
@@ -24,7 +26,7 @@ modisProducts <- function() {
 
 #-----------------------
 
-.modisHTTP <- function(x,v='005') {
+.modisHTTP <- function(x,v='005',opt) {
   if (!requireNamespace("RCurl",quietly = TRUE)) stop("Package RCurl is not installed")
   mp <- modisProducts()
   if (is.numeric(x)) {
@@ -46,7 +48,7 @@ modisProducts <- function() {
     if (!RCurl::url.exists(xx)) {
       if (!RCurl::url.exists(paste("http://e4ftl01.cr.usgs.gov/",ad,"/",sep=""))) stop("the http address does not exist! Version may be incorrect OR Server is down!")
       else {
-        items <- try(strsplit(RCurl::getURL(paste("http://e4ftl01.cr.usgs.gov/",ad,"/",sep="")), "\r*\n")[[1]],silent=TRUE)
+        items <- try(strsplit(RCurl::getURL(paste("http://e4ftl01.cr.usgs.gov/",ad,"/",sep=""),.opt=opt), "\r*\n")[[1]],silent=TRUE)
         dirs <- unlist(lapply(strsplit(unlist(lapply(strsplit(items[-c(1:19)],'href'),function(x){strsplit(x[2],'/')[[1]][1]})),'"'),function(x) {x[2]}))
         dirs <- na.omit(dirs)
         w <- which(unlist(lapply(strsplit(dirs,'\\.'),function(x) x[[1]])) == x)
@@ -59,7 +61,7 @@ modisProducts <- function() {
 }
 
 #-----------------
-.getModisList <- function(x,h,v,dates) {
+.getModisList <- function(x,h,v,dates,opt) {
   if (!requireNamespace("RCurl",quietly = TRUE)) stop("Package RCurl is not installed")
   if (inherits(dates,"character")) dates <- as.Date(dates,format='%Y.%m.%d')
   dates <- na.omit(as.Date(dates))
@@ -70,7 +72,7 @@ modisProducts <- function() {
   class(items) <- "try-error"
   ce <- 0
   while(class(items) == "try-error") { 
-    items <- try(strsplit(RCurl::getURL(x), "\r*\n")[[1]],silent=TRUE)
+    items <- try(strsplit(RCurl::getURL(x,.opts = opt), "\r*\n")[[1]],silent=TRUE)
     if (class(items) == "try-error") {
       Sys.sleep(5)
       ce <- ce + 1
@@ -99,7 +101,7 @@ modisProducts <- function() {
     class(getlist) <- "try-error"
     ce <- 0
     while(class(getlist) == "try-error") {
-      getlist <- try(strsplit(RCurl::getURL(paste(x,dirs[i], "/", sep="")), "\r*\n")[[1]],silent=TRUE)
+      getlist <- try(strsplit(RCurl::getURL(paste(x,dirs[i], "/", sep=""),.opts = opt), "\r*\n")[[1]],silent=TRUE)
       if (class(getlist) == "try-error") {
         Sys.sleep(5)
         ce <- ce + 1
@@ -137,19 +139,25 @@ modisProducts <- function() {
 }
 #--------
 
-.downloadHTTP <- function(x,filename) {
+.downloadHTTP <- function(x,filename,opt) {
   if (!requireNamespace("RCurl",quietly = TRUE)) stop("Package RCurl is not installed")
   success <- FALSE
-  er <- try(writeBin(RCurl::getBinaryURL(x),con=filename),silent=TRUE)
+  #er <- try(writeBin(RCurl::getBinaryURL(x,userpwd=up,httpauth = 3L),con=filename),silent=TRUE)
+  er <- try(writeBin(RCurl::getBinaryURL(x,.opts = opt),con=filename),silent=TRUE)
   if (class(er) == "try-error") print("Download Error: Server does not response!!")
   else success <- TRUE
   return(success)
 }
 
-.getMODIS <- function(x, h, v, dates, version='005') {
-  xx <- .modisHTTP(x,v=version)
-  Modislist <- .getModisList(xx,h=h,v=v,dates=dates)
+.getMODIS <- function(x, h, v, dates, version='005',opt) {
+  xx <- .modisHTTP(x,v=version,opt=opt)
+  Modislist <- .getModisList(xx,h=h,v=v,dates=dates,opt=opt)
+  
+  
   if (length(Modislist) == 0) stop("There is NO available images for the specified product!")
+  
+  cat(sum(unlist(lapply(Modislist,length))),'images are found for the specified dates!\n')
+  
   out <- data.frame(matrix(nrow=0,ncol=2))
   names(out) <- c("Date","Name")
   dirs <- names(Modislist)
@@ -159,21 +167,34 @@ modisProducts <- function() {
     for (ModisName in Modislist[[d]]) {
       n <- strsplit(ModisName,"/")[[1]]
       n <- n[length(n)]
-      if (.downloadHTTP(ModisName,n)) {
+      if (.downloadHTTP(ModisName,n,opt=opt)) {
         out <- rbind(out,data.frame(Date=d,Name=n))
-      }
+        cat('=')
+      } else cat('0')
       cnt <- cnt + 1
     }
-    
   }
+  cat(' \n')
   out
 }
 
 #---------
-
+.setAuth <- function() {
+  if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) {
+    if (file.exists(paste0(Sys.getenv('HOME'),'/.netrc'))) {
+      if (!file.exists(paste0(Sys.getenv('HOME'),'/.urs_cookies'))) file.create(paste0(Sys.getenv('HOME'),'/.urs_cookies'))
+      .rtsOptions$addOption('nasaAuth',list(netrc.file=paste0(Sys.getenv('HOME'),'/.netrc'),
+                                            cookiefile=paste0(Sys.getenv('HOME'),'/.urs_cookies')))
+    }
+  }
+}
 
 #------------
 
+if (!isGeneric("setNASAauth")) {
+  setGeneric("setNASAauth", function(username,password,update,...)
+    standardGeneric("setNASAauth"))
+}
 
 
 if (!isGeneric("getMODIS")) {
@@ -194,6 +215,87 @@ if (!isGeneric("ModisDownload")) {
   setGeneric("ModisDownload", function(x,h,v,dates, ...)
     standardGeneric("ModisDownload"))
 }
+
+setMethod("setNASAauth", "ANY",
+          function(username,password,update=FALSE,echo=TRUE) {
+            if (missing(update)) update <- FALSE
+            if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) {
+              if (!file.exists(paste0(Sys.getenv('HOME'),'/.netrc'))) {
+                if (missing(username) | missing(password)) stop('username and/or password should be defined!')
+                if (!is.character(username) | !is.character(password)) stop('username and password, both should be character!')
+                file.create(paste0(Sys.getenv('HOME'),'/.netrc'))
+                f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'w')
+                cat("machine urs.earthdata.nasa.gov login",username,"password",password,"\n",file=f)
+                close(f)
+                Sys.chmod(paste0(Sys.getenv('HOME'),'/.netrc'),"0600")
+              } else {
+                f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'r')
+                a <- readLines(f)
+                close(f)
+                if (length(a) > 0) {
+                  b <- lapply(a,function(x) strsplit(x,' ')[[1]])
+                  b <- lapply(b,function(x) {if ('' %in% x) x[x != ''] else x})
+                  w <- which(unlist(lapply(b,length)) == 0)
+                  if (length(w) > 0) b <- b[-w]
+                  b <- unlist(lapply(b,function(x) {if (x[1] == 'machine' & x[2] == "urs.earthdata.nasa.gov") TRUE else FALSE}))
+                  if (!any(b)) {
+                    if (missing(username) | missing(password)) stop('username and/or password should be defined!')
+                    if (!is.character(username) | !is.character(password)) stop('username and password, both should be character!')
+                    f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'a')
+                    cat("\nmachine urs.earthdata.nasa.gov login",username,"password",password,"\n",file=f)
+                    close(f)
+                    Sys.chmod(paste0(Sys.getenv('HOME'),'/.netrc'),"0600")
+                  }
+                }
+              }
+              if (!file.exists(paste0(Sys.getenv('HOME'),'/.urs_cookies'))) file.create(paste0(Sys.getenv('HOME'),'/.urs_cookies'))
+              .rtsOptions$addOption('nasaAuth',list(netrc.file=paste0(Sys.getenv('HOME'),'/.netrc'),
+                                                    cookiefile=paste0(Sys.getenv('HOME'),'/.urs_cookies')))
+              if (echo) cat('username and password are successfully added!')
+            } else if (update) {
+              if (!file.exists(paste0(Sys.getenv('HOME'),'/.netrc'))) {
+                if (missing(username) | missing(password)) stop('username and/or password should be defined!')
+                file.create(paste0(Sys.getenv('HOME'),'/.netrc'))
+                f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'w')
+                cat("machine urs.earthdata.nasa.gov login",username,"password",password,"\n",file=f)
+                close(f)
+                Sys.chmod(paste0(Sys.getenv('HOME'),'/.netrc'),"0600")
+              } else {
+                f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'r')
+                a <- readLines(f)
+                close(f)
+                if (length(a) > 0) {
+                  b <- lapply(a,function(x) strsplit(x,' ')[[1]])
+                  b <- lapply(b,function(x) {if ('' %in% x) x[x != ''] else x})
+                  w <- which(unlist(lapply(b,length)) == 0)
+                  if (length(w) > 0) b <- b[-w]
+                  bb <- unlist(lapply(b,function(x) {if (x[1] == 'machine' & x[2] == "urs.earthdata.nasa.gov") TRUE else FALSE}))
+                  if (!any(bb)) {
+                    f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'a')
+                    cat("\nmachine urs.earthdata.nasa.gov login",username,"password",password,"\n",file=f)
+                    close(f)
+                    Sys.chmod(paste0(Sys.getenv('HOME'),'/.netrc'),"0600")
+                  } else {
+                    w <- which(bb)
+                    for (i in 1:length(b)) b[[i]] <- paste(b[[i]],collapse=' ')
+                    b[w[1]] <- paste("machine urs.earthdata.nasa.gov login",username,"password",password)
+                    f <- file(paste0(Sys.getenv('HOME'),'/.netrc'),'w')
+                    for (bb in b) cat(bb,'\n',file=f)
+                    close(f)
+                    Sys.chmod(paste0(Sys.getenv('HOME'),'/.netrc'),"0600")
+                  }
+                }
+              }
+              if (!file.exists(paste0(Sys.getenv('HOME'),'/.urs_cookies'))) file.create(paste0(Sys.getenv('HOME'),'/.urs_cookies'))
+              .rtsOptions$addOption('nasaAuth',list(netrc.file=paste0(Sys.getenv('HOME'),'/.netrc'),
+                                                    cookiefile=paste0(Sys.getenv('HOME'),'/.urs_cookies')))
+              if (echo) cat('\nusername and password are successfully updated...!')
+            } else {
+              if (echo) cat('\nusername and password are already exist; to update, use update=TRUE!')
+            }
+          }
+)
+
 
 setMethod("mosaicHDF", "character",
           function(hdfNames,filename,MRTpath,bands_subset,delete=FALSE) {
@@ -254,8 +356,15 @@ setMethod("reprojectHDF", "character",
 
 setMethod("getMODIS", "character",
           function(x,h,v,dates,version='005') {
-            xx <- .modisHTTP(x,v=version)
-            Modislist <- .getModisList(xx,h=h,v=v,dates=dates)
+            if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
+            else {
+              opt <- .rtsOptions$getOption(n = 'nasaAuth')
+              opt <- RCurl::curlOptions(netrc=TRUE, netrc.file=opt$netrc.file,
+                                 cookiefile=opt$cookiefile,
+                                 followlocation=TRUE)
+            }
+            xx <- .modisHTTP(x,v=version,opt=opt)
+            Modislist <- .getModisList(xx,h=h,v=v,dates=dates,opt=opt)
             if (length(Modislist) == 0) stop("There is NO available images for the specified product!")
             
             dirs <- names(Modislist)
@@ -269,7 +378,7 @@ setMethod("getMODIS", "character",
               for (ModisName in Modislist[[d]]) {
                 n <- strsplit(ModisName,"/")[[1]]
                 n <- n[length(n)]
-                if (.downloadHTTP(ModisName,n)) dwnld[cnt] <- TRUE
+                if (.downloadHTTP(ModisName,n,opt=opt)) dwnld[cnt] <- TRUE
                 cnt <- cnt + 1
               }
               out[dc,3] <- length(which(dwnld))
@@ -285,8 +394,16 @@ setMethod("getMODIS", "character",
 
 setMethod("getMODIS", "numeric",
           function(x,h,v,dates,version='005') {
-            xx <- .modisHTTP(x,v=version)
-            Modislist <- .getModisList(xx,h=h,v=v,dates=dates)
+            if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
+            else {
+              opt <- .rtsOptions$getOption(n = 'nasaAuth')
+              opt <- RCurl::curlOptions(netrc=TRUE, netrc.file=opt$netrc.file,
+                                        cookiefile=opt$cookiefile,
+                                        followlocation=TRUE)
+            }
+            
+            xx <- .modisHTTP(x,v=version,opt=opt)
+            Modislist <- .getModisList(xx,h=h,v=v,dates=dates,opt=opt)
             if (length(Modislist) == 0) stop("There is NO available images for the specified product!")
             
             dirs <- names(Modislist)
@@ -300,12 +417,16 @@ setMethod("getMODIS", "numeric",
               for (ModisName in Modislist[[d]]) {
                 n <- strsplit(ModisName,"/")[[1]]
                 n <- n[length(n)]
-                if (.downloadHTTP(ModisName,n)) dwnld[cnt] <- TRUE
+                if (.downloadHTTP(ModisName,n,opt=opt)) {
+                  dwnld[cnt] <- TRUE
+                  cat('=')
+                } else cat('0')
                 cnt <- cnt + 1
               }
               out[dc,3] <- length(which(dwnld))
               dc <- dc+1
             }
+            cat('\n')
             if (sum(out[,3]) > 0) {
               cat(paste('from ', sum(out[,2]),' available images, ',sum(out[,3]),' images are successfully downloaded.',sep=''))
             } else cat('Download is failed!')
@@ -316,7 +437,16 @@ setMethod("getMODIS", "numeric",
 
 setMethod("ModisDownload", "character",
           function(x,h,v,dates,version='005',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size) {
-            dHDF <- .getMODIS(x,h,v,dates,version)
+            
+            if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
+            else {
+              opt <- .rtsOptions$getOption(n = 'nasaAuth')
+              opt <- RCurl::curlOptions(netrc=TRUE, netrc.file=opt$netrc.file,
+                                        cookiefile=opt$cookiefile,
+                                        followlocation=TRUE)
+            }
+            
+            dHDF <- .getMODIS(x,h,v,dates,version,opt=opt)
             dHDF$Date <- as.character(dHDF$Date)
             dHDF$Name <- as.character(dHDF$Name)
             if (nrow(dHDF) < 2) mosaic <- FALSE
@@ -375,6 +505,14 @@ setMethod("ModisDownload", "character",
 
 setMethod("ModisDownload", "numeric",
           function(x,h,v,dates,version='005',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size) {
+            if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
+            else {
+              opt <- .rtsOptions$getOption(n = 'nasaAuth')
+              opt <- RCurl::curlOptions(netrc=TRUE, netrc.file=opt$netrc.file,
+                                        cookiefile=opt$cookiefile,
+                                        followlocation=TRUE)
+            }
+            
             dHDF <- .getMODIS(x,h,v,dates,version)
             dHDF$Date <- as.character(dHDF$Date)
             dHDF$Name <- as.character(dHDF$Name)

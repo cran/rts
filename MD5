@@ -1,7 +1,7 @@
-910f59d70755c0a6d5dc191af3a1dd78 *DESCRIPTION
+8fdd1b336a892e931fe17ec67f1bdef4 *DESCRIPTION
 b62d0c56601cab8415f26814d8cf785f *NAMESPACE
-c7b4aecef30baefc5dff1ddcb5124130 *R/AAAClasses.R
-7e507df2d75104c2fd9c9c0eca49ff8d *R/ModisDownload.R
+04551a27af7d9a9748e2547aff0c9877 *R/AAAClasses.R
+b565678b69decca543832a0aa3b4c165 *R/ModisDownload.R
 f83417f9f59b03346df2f7cf63d51655 *R/apply.R
 016aabb9a30ce3ff490f2855f4e87f36 *R/cellFrom.R
 e040963b6506f4274e910fc3413259c8 *R/endpoints.R
@@ -13,6 +13,7 @@ e040963b6506f4274e910fc3413259c8 *R/endpoints.R
 3d9ac275337c518d04952eb68a89b4ba *R/show.R
 596f7aac807b33dd379db36f28f81b7d *R/subset.R
 40947af48cffa4631710eca8aae311f9 *R/writerts.R
+fcd98675975809082b8812084df20ebd *R/zzz.R
 05ec22f32f1b914cd9050dc5115c2123 *inst/external/ModisLP.RData
 fb550acefc6287c3f32df4b1c30865eb *inst/external/ndvi/ndvi.grd
 741359c0639d149ff24c6f6123f24388 *inst/external/ndvi/ndvi.gri
@@ -21,7 +22,7 @@ aa90b01000fc3cb7f6b20c6a833cc803 *inst/external/ndvi/ndvi.rts
 d7b0fc1f6a1286bd03b81358e2732566 *inst/external/r2.asc
 39886e72375e780aea0058e8d71889c6 *inst/external/r3.asc
 8ea0bf8f2dd9830907ef9137a07b4d75 *inst/external/r4.asc
-1f5da5b48769d6f0545d920852c1a270 *man/ModisDownload.Rd
+74295da5ad0859f1333a2184d53f4e08 *man/ModisDownload.Rd
 c2620f4ff36684dff925b7d9499dc441 *man/RasterStackBrick-class.Rd
 faf6cd96d281438452b876966893edc0 *man/apply.monthly.Rd
 b070444a6307dd8a176647e757fb7b52 *man/cellFromXY.Rd
