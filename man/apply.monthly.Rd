@@ -50,7 +50,7 @@ A raster time series (\code{Raster*TS}) object
 }
 
 \examples{
-
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -58,4 +58,6 @@ ndvi
 ndvi.y <- apply.yearly(ndvi, mean) # apply mean function for each year
 ndvi.y
 ndvi.q <- apply.quarterly(ndvi,sd) # apply sd function for each quarter of years
-ndvi.q }
+ndvi.q 
+}
+}

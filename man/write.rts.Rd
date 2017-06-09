@@ -43,6 +43,8 @@ This function is used for writing values to a series of files.
 \seealso{ \code{\link[rts]{read.rts}}, \code{\link[raster]{writeRaster}}}
 
 \examples{
+
+\dontrun{
 path <- system.file("external", package="rts") # location of files
 
 lst <- list.files(path=path,pattern='.asc$',full.names=TRUE)
@@ -61,6 +63,8 @@ write.rts(n,"nf") # writing n into the working directory
 rt <- read.rts("nf") # reading nf from the working directory
 
 rt
+
+}
 
 }
 

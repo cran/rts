@@ -35,12 +35,14 @@
 \seealso{ \code{\link[xts]{index.xts}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
 
 index(ndvi)
 
+}
 
 }
 

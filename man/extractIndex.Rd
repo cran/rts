@@ -63,6 +63,7 @@ the \pkg{xts} package.
 \seealso{ \code{\link[rts]{extract}} and \code{\link[xts]{[.xts}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -88,6 +89,8 @@ n4 <- ndvi[10:20,"2008-05-01"] #extract the values at cell numbers of 10:20 for
 
 n4
 
+
+}
 
 }
 

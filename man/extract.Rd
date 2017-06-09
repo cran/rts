@@ -65,6 +65,7 @@ An \code{rts} object.
 \seealso{\code{\link[xts]{[.xts}} and \code{\link[raster]{extract}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -88,6 +89,8 @@ n4 <- extract(ndvi,10:20,"2008") # extract the values at cell numbers of 10:20 i
 # the year of 2008
 
 n4
+}
+
 
 
 }

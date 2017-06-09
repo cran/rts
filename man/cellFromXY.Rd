@@ -38,6 +38,7 @@ row, column or cell number(s). cellFromLine and cellFromPolygon return a list.
 
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 rt <- rts(file) # read the ndvi time series from the specified file
@@ -46,6 +47,8 @@ cellFromRowCol(rt,15,20)
 cellFromRowCol(rt,c(16:20),c(11:15))
 
 cellFromXY(rt,c(645000,57345000))
+}
+
 }
 
 \keyword{ spatial }

@@ -5,6 +5,8 @@
 \alias{reprojectHDF}
 \alias{modisProducts}
 \alias{setNASAauth}
+\alias{getNativePixelSize}
+\alias{getNativeTemporalResolution}
 
 \alias{ModisDownload,character-method}
 \alias{ModisDownload,numeric-method}
@@ -26,13 +28,17 @@ setNASAauth(username,password,update,...)
 
 ModisDownload(x,h,v,dates, ...)
 
-getMODIS(x,h,v,dates,version='005')
+getMODIS(x,h,v,dates,version='005',forceReDownload=TRUE,ncore='auto')
 
 mosaicHDF(hdfNames,filename,MRTpath,bands_subset,delete=FALSE)
 
-reprojectHDF(hdfName,filename,MRTpath, ...)
+reprojectHDF(hdfName,filename,MRTpath,...)
 
-modisProducts()
+modisProducts(version=NULL)
+
+getNativePixelSize(product)
+
+getNativeTemporalResolution(product)
 }
 
 \arguments{
@@ -50,6 +56,12 @@ modisProducts()
   \item{version}{ the product version. The default value is '005'}
   \item{bands_subset}{HDF-EOS input files contain several layers of data (bands). Through this argument you ca select a subset of bands. You need to know how many bands the product has, and which bands you want to be subset. Example: Suppose your image has 6 bands and you only need the second band. The parameter should be entered as: bands_subset="0 1 0 0 0 0".}
   \item{delete}{ Logical. If \code{TRUE}, the original HDF files will be deleted after mosaic or reproject into new files.}
+  \item{forceReDownload}{logical, specify whether the product should be re-downloaded if it had been downloaded before. The downloaded products are cashed using a hash digest of the inputs. If the download is canceled mid-way and the same exact products are downloaded again, it can be useful to avoid re-downloading them.}
+  
+  \item{ncore}{numerical; specify the number of cores used to speed up the download; 'auto' can be used instead to detect the number of cores and use half of them}
+  
+  \item{product}{The product name; can be extracted from the \code{modisProduct} function}
+  
   \item{...}{ additional arguments including:
   
   - \code{mosaic}: logical, if \code{TRUE}, the images (several tiles) are mosaic into a single image
@@ -85,7 +97,7 @@ The functions \code{ModisDownload} uses the functions including  \code{getMODIS}
 }
 
 
-\author{Babak Naimi
+\author{Babak Naimi & Pablo Alfaro
 
 \email{naimi.b@gmail.com}
 
@@ -95,18 +107,22 @@ The functions \code{ModisDownload} uses the functions including  \code{getMODIS}
 
 
 \examples{
+\dontrun{
+library(raster)
 
-#library(raster)
-
-#library(RCurl)
+library(RCurl)
 
 # First, you need to register on https://urs.earthdata.nasa.gov/ and get a username and password
 # for the first time, set the authentication info:
-# setNASAauth(username='myusername',password='mypass') 
+
+setNASAauth(username='myusername',password='mypass') 
 
 # product list:
 
-#modisProducts( )
+
+modisProducts(version=5)
+modisProducts(version=6)
+modisProducts(version=NULL) # both versions
 
 #x=3 # or x="MOD14A1"
 
@@ -114,23 +130,23 @@ The functions \code{ModisDownload} uses the functions including  \code{getMODIS}
 
 # Following command only downloads the source HDF images, no mosaic and no projection
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01',mosaic=F,proj=F)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01',mosaic=F,proj=F)
 
  
 # alternatively, you can use modisHDF to download only HDF images:
 
-#modisHDF(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01')
+modisHDF(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01')
 
 # same as the above command, but downloads all available images in 2011:
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.01.01','2011.12.31'))
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.01.01','2011.12.31'))
 
 #------
 
 # Downloads selected tiles, and mosaic them, but no projections:
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
-#mosaic=T,proj=F)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),
+              MRTpath='d:/MRT/bin',mosaic=T,proj=F)
 
 #--- alternatively, you can first download the HDF images using getMODIS, 
 #and then mosaic them using mosaicHDF!
@@ -138,24 +154,29 @@ The functions \code{ModisDownload} uses the functions including  \code{getMODIS}
 # Downloads selected tiles, and mosaic, reproject them in UTM_WGS84, zone 30 projection and 
 #convert all bands into Geotif format (the original HDF will be deleted!):
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
-#mosaic=T,proj=T,proj_type="UTM",utm_zone=30,datum="WGS84",pixel_size=1000)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
+              mosaic=T,proj=T,proj_type="UTM",utm_zone=30,datum="WGS84",pixel_size=1000)
 
 # Same as above command, but only second band out of 6 bands will be kept. (You do not need 
 #to specify proj_params when "UTM" is selected as proj_type and the zone also is specified,
 #but for other types of projections you do).
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
-#mosaic=T,proj=T, bands_subset="0 1 0 0 0 0", proj_type="UTM",
-#proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,datum="WGS84",pixel_size=1000)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
+              mosaic=T,proj=T, bands_subset="0 1 0 0 0 0", proj_type="UTM",
+              proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,
+              datum="WGS84",pixel_size=1000)
 
  
 # Same as above command, but it spatially subsets the images into the specified box (UL and LR):
 
-#ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
-#mosaic=T,proj=T,UL=c(-42841.0,4871530.0),LR=c(1026104,3983860), bands_subset="0 1 0 0 0 0", 
-#proj_type="UTM",proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,datum="WGS84",
-#pixel_size=1000)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
+             mosaic=T,proj=T,UL=c(-42841.0,4871530.0),LR=c(1026104,3983860), 
+             bands_subset="0 1 0 0 0 0", proj_type="UTM",
+             proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,datum="WGS84",
+             pixel_size=1000)
+
+
+}
 
 }
 

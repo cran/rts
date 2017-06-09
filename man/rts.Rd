@@ -45,6 +45,8 @@ Babak Naimi
 \seealso{ \code{\link[raster]{stack}, \link[raster]{brick}, \link[xts]{xts}}}
 
 \examples{
+
+\dontrun{
 path <- system.file("external", package="rts") # location of files
 
 lst <- list.files(path=path,pattern='.asc$',full.names=TRUE)
@@ -63,6 +65,9 @@ rt <- rts(r,d) # creating a RasterStackTS object
 rt
 
 plot(rt)
+}
+
+
 
 }
 

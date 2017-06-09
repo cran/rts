@@ -48,6 +48,7 @@ A numeric vector of endpoints beginning with 0 and ending with a value equal to 
 \seealso{ \code{\link[xts]{endpoints}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -55,6 +56,8 @@ ndvi <- rts(file) # read the ndvi time series from the specified file
 endpoints(ndvi,"years")
 
 endpoints(ndvi,"quarters")
+}
+
 }
 
 \keyword{ utilities }

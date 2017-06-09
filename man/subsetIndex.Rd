@@ -41,6 +41,7 @@ This function can be used to extract a raster layer or a set of raster lasyers b
 \seealso{ \code{\link[rts]{subset}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -50,6 +51,8 @@ s1 <- ndvi[["2000-01-01/2000-05-31"]]
 s1
 
 plot(s1)
+
+}
 
 }
 

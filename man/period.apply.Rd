@@ -38,6 +38,7 @@ RasterStackTS or RasterBrickTS
 \seealso{ \code{\link[xts]{period.apply}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -60,6 +61,8 @@ f <- function(x) {
 }
 
 ndvi.q <- period.apply(ndvi,ep,f) # apply the function f on each quarter
+
+}
 
 }
 

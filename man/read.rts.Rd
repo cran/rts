@@ -36,6 +36,7 @@ This function reads a raster time series object which has been writen by \code{\
 \seealso{ \code{\link[rts]{write.rts}, \link[rts]{rts}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 rt <- read.rts(file)
@@ -44,6 +45,8 @@ rt
 
 # or alternatively:
 rt <- rts(file)
+}
+
 }
 
 \keyword{ write, write raster time series}

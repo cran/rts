@@ -57,6 +57,7 @@ CCYYMMDD HH:MM:SS.ss+/CCYYMMDD HH:MM:SS.ss
 \seealso{ \code{\link[raster]{plot}}, \code{\link[rts]{extract}}, \code{\link[rts]{subset}}}
 
 \examples{
+\dontrun{
 file <- system.file("external/ndvi", package="rts")
 
 ndvi <- rts(file) # read the ndvi time series from the specified file
@@ -99,6 +100,8 @@ plot(n3,y=1:3,col=1)
 plot(n3,y=1:3,col=c(1,4,5))
 
 plot(n3,y='all')
+}
+
 }
 
 \keyword{methods}
