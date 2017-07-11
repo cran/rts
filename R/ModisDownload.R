@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 6.0 (last update): June. 2017
+# Version: 6.1 (last update): July 2017
 # Author: Babak Naimi (naimi.b@gmail.com), and (from version 5.4) Pablo Alfaro (ludecan@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -269,7 +269,7 @@ getNativeTemporalResolution <- function(product) {
         if (any(w)) getlist <- getlist[w]
         
         dir.create(dirname(pathCache), showWarnings=FALSE, recursive = TRUE)
-        saveRDS(object = Modislist, file=pathCache)
+        saveRDS(object = getlist, file=pathCache)
       } else {
         getlist <- readRDS(file = pathCache)
       }
