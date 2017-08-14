@@ -1,6 +1,6 @@
 # Author: Babak Naimi, naimi.b@gmail.com
-# Date :  July 2012
-# Version 1.0
+# Date :  August 2017
+# Version 1.1
 # Licence GPL v3
 
 setOldClass("xts")
@@ -50,4 +50,3 @@ setRefClass(".rtsOptions",
             )
 )
 .rtsOptions <- new('.rtsOptions')
-

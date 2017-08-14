@@ -5,6 +5,7 @@
 \alias{reprojectHDF}
 \alias{modisProducts}
 \alias{setNASAauth}
+\alias{setMRTpath}
 \alias{getNativePixelSize}
 \alias{getNativeTemporalResolution}
 
@@ -17,6 +18,8 @@
 \alias{getMODIS,character-method}
 \alias{getMODIS,numeric-method}
 \alias{setNASAauth,ANY-method}
+\alias{setMRTpath,ANY-method}
+
 \title{Download, reproject, and mosaic Modis satellite images}
 
 \description{
@@ -25,6 +28,8 @@
 
 \usage{
 setNASAauth(username,password,update,...)
+
+setMRTpath(MRTpath,update,...)
 
 ModisDownload(x,h,v,dates, ...)
 

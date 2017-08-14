@@ -1,7 +1,7 @@
-b2018d13764ee5508fe254db33a19b18 *DESCRIPTION
-f5f407e7eb372fc7078b439f26a5006c *NAMESPACE
-04551a27af7d9a9748e2547aff0c9877 *R/AAAClasses.R
-da3703b61eb82e814646655b50def375 *R/ModisDownload.R
+cd2d0f2db8caba7f0fcd36be37a0d9c8 *DESCRIPTION
+0cc1579e8699bd8819c012db9418fa40 *NAMESPACE
+04a9dae589143869d3b9bd5286d172ea *R/AAAClasses.R
+c8f8b7c8bb195a0a293deee73784a27a *R/ModisDownload.R
 f83417f9f59b03346df2f7cf63d51655 *R/apply.R
 016aabb9a30ce3ff490f2855f4e87f36 *R/cellFrom.R
 e040963b6506f4274e910fc3413259c8 *R/endpoints.R
@@ -13,7 +13,7 @@ e040963b6506f4274e910fc3413259c8 *R/endpoints.R
 3d9ac275337c518d04952eb68a89b4ba *R/show.R
 596f7aac807b33dd379db36f28f81b7d *R/subset.R
 40947af48cffa4631710eca8aae311f9 *R/writerts.R
-fcd98675975809082b8812084df20ebd *R/zzz.R
+a1f67c1ad5cb7938251ff620e50cdc03 *R/zzz.R
 05ec22f32f1b914cd9050dc5115c2123 *inst/external/ModisLP.RData
 3db74d220abd0e2cba2d72e569140946 *inst/external/ModisLPV5.rds
 6e83a7f032eca9abe1836df14704100e *inst/external/ModisLPV6.rds
@@ -24,7 +24,7 @@ aa90b01000fc3cb7f6b20c6a833cc803 *inst/external/ndvi/ndvi.rts
 d7b0fc1f6a1286bd03b81358e2732566 *inst/external/r2.asc
 39886e72375e780aea0058e8d71889c6 *inst/external/r3.asc
 8ea0bf8f2dd9830907ef9137a07b4d75 *inst/external/r4.asc
-3a0fcc60c66005280e9ddfd2c19db607 *man/ModisDownload.Rd
+03e1a27bacc4b34212470588b18d1149 *man/ModisDownload.Rd
 c2620f4ff36684dff925b7d9499dc441 *man/RasterStackBrick-class.Rd
 53a0d410ab678c307a05f561080d5297 *man/apply.monthly.Rd
 eff5f102bba1c38283f042aea4c0836c *man/cellFromXY.Rd
