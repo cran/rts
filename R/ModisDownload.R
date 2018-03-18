@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 6.6 (last update): August 2017
+# Version: 7.3 (last update): March 2018
 # Author: Babak Naimi (naimi.b@gmail.com), and (from version 5.4) Pablo Alfaro (ludecan@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -24,8 +24,13 @@
 # parallel is used to call parLapplyLB to do the parallel downloads
 # palfaro @ 2017-01-09
 # create a RCurl handle which will be reused between connections to enable http keepalives
-.._MD_curlHandle <- NULL
 
+.eval <- function(x) {
+  eval(parse(text=x))
+}
+
+.eval('.._MD_curlHandle <- RCurl::getCurlHandle()')
+.eval('.._MD_curlHandle <<- RCurl::getCurlHandle()')
 modisProducts <- function(version=NULL) {
   #.ModisLPxxx <- NULL
   #load(system.file("external/ModisLP.RData", package="rts"))
@@ -158,11 +163,11 @@ getNativeTemporalResolution <- function(product) {
   if (forceReDownload | !file.exists(pathCache)) {
     # if forceReDownload or cache doesn't exist then access the MODIS url, else use the cached version
     serverErrorsPattern <- '503 Service Unavailable|500 Internal Server Error'
-    try.nr <- 5
+    try.nr <- 10
     items <- 0
-    class(items) <- "try-error"
+    success <- FALSE
     ce <- 0
-    while(class(items) == "try-error") { 
+    while(!success) { 
       # palfaro @ 2017-01-09
       items <- try(strsplit(RCurl::getURL(x,.opts = opt), "\r*\n")[[1]],silent=TRUE)
       
@@ -170,7 +175,7 @@ getNativeTemporalResolution <- function(product) {
         Sys.sleep(15)
         ce <- ce + 1
         if (ce == (try.nr+1)) stop("Download error: Server does not response!")
-      }
+      } else { success <- TRUE }
     }
     items <- items[-1]
     # get the directory names (available dates)
@@ -252,19 +257,19 @@ getNativeTemporalResolution <- function(product) {
       pathCache <- paste('RCache/', basename(productURL), '_', dir, '.rds', sep = '')
       if (forceReDownload | !file.exists(pathCache)) {
         getlist <- 0
-        class(getlist) <- "try-error"
+        success <- FALSE
         ce <- 0
-        while(class(getlist) == "try-error") {
+        while(!success) {
           # palfaro @ 2017-01-09
           # reuse MD_curlHandle to enable http keepalive
           getlist <- try(strsplit(RCurl::getURL(paste(productURL,dir, "/", sep=""),.opts = opt, curl = RCurl::getCurlHandle()), "\r*\n")[[1]],silent=TRUE)
-          
           if (class(getlist) == "try-error" || (length(getlist) < 30 && length(grep(pattern = serverErrorsPattern, getlist)) > 0)) {
             Sys.sleep(15)
             ce <- ce + 1
-            if (ce == 6) stop(paste("Download error: Server does not response!\n", getlist))
-          }
+            if (ce == 10) stop(paste("Download error: Server does not response!\n", getlist))
+          } else { success <- TRUE }
         }
+        # writeLines(getlist, paste('RCache/', basename(productURL), '_', dir, '.txt', sep = ''))
         
         # palfaro @ 2017-01-17
         # Add fixed = TRUE, slightly speeds up the parsing of the file
@@ -309,6 +314,7 @@ getNativeTemporalResolution <- function(product) {
       # palfaro @ 2017-01-09
       # The curl handles must be created in the processes that are going to use them so we create them
       # using clusterEvalQ
+      #parallel::clusterExport(cl,c('.._MD_curlHandle'))
       parallel::clusterEvalQ(cl, expr = { .._MD_curlHandle <- RCurl::getCurlHandle()})
       Modislist <- parallel::parLapplyLB(cl=cl, X=dirs, fun=getModisName, productURL=x, h=h, v=v, opt=opt, serverErrorsPattern=serverErrorsPattern, forceReDownload=forceReDownload)
       parallel::stopCluster(cl)
@@ -318,7 +324,7 @@ getNativeTemporalResolution <- function(product) {
       # getModisName to find it. In the parallel case it gets created in the global environment in the clusterEvalQ call
       # but if we call the same expression here it gets created in the current environment, thus we use assign
       #assign(".rtsOptions$getOption('MD_curlHandle')", RCurl::getCurlHandle(), envir = .GlobalEnv)
-      .._MD_curlHandle <<- RCurl::getCurlHandle()
+      #.._MD_curlHandle <<- RCurl::getCurlHandle()
       Modislist <- lapply(dirs, FUN = getModisName, productURL=x, h=h, v=v, opt=opt, serverErrorsPattern=serverErrorsPattern, forceReDownload=forceReDownload)
       #rm(.rtsOptions$getOption('MD_curlHandle'), envir = .GlobalEnv)
       #rm(.._MD_curlHandle, envir = .GlobalEnv)
@@ -341,7 +347,7 @@ getNativeTemporalResolution <- function(product) {
 #--------
 
 .downloadHTTP <- function(x,filename,opt, forceReDownload=TRUE, 
-                          maxRetries=5, secondsBetweenRetries=15) {
+                          maxRetries=10, secondsBetweenRetries=15) {
   if (!requireNamespace("RCurl",quietly = TRUE)) stop("Package RCurl is not installed")
   # palfaro @ 2017-07-13 
   # this shouldn't be here, else each time we download a new file the curl handle is being recreated
@@ -395,7 +401,8 @@ getNativeTemporalResolution <- function(product) {
     # Write directly to file, without going through memory, should be slightly faster.
     # Also, reuse .rtsOptions$getOption('MD_curlHandle') to enable http keepalive
     f = RCurl::CFILE(filename, mode="wb")
-    er2 <- try(er <- RCurl::curlPerform(url = x, curl=get('.._MD_curlHandle'), writedata = f@ref, .opts = opt))
+    #er2 <- try(er <- RCurl::curlPerform(url = x, curl=get('.._MD_curlHandle'), writedata = f@ref, .opts = opt))
+    er2 <- try(er <- RCurl::curlPerform(url = x, curl=RCurl::getCurlHandle(), writedata = f@ref, .opts = opt))
     RCurl::close(f)
     
     # palfaro @ 2017-01-02
@@ -488,7 +495,7 @@ getNativeTemporalResolution <- function(product) {
     # getModisName to find it. In the parallel case it gets created in the global environment in the clusterEvalQ call
     # but if we call the same expression here it gets created in the current environment, thus we use assign
     #assign(".rtsOptions$getOption('MD_curlHandle')", RCurl::getCurlHandle(), envir = .GlobalEnv)
-    .._MD_curlHandle <<- RCurl::getCurlHandle()
+    #.._MD_curlHandle <<- RCurl::getCurlHandle()
     res <- lapply(X = 1:nrow(plainModisList), FUN = getFile, plainModisList=plainModisList, opt=opt, forceReDownload=forceReDownload)
     #rm(.._MD_curlHandle, envir = .GlobalEnv)
   }
@@ -640,11 +647,11 @@ setMethod("setMRTpath", "ANY",
             if (missing(update)) update <- FALSE
             if (is.null(.rtsOptions$getOption(n = 'MRTpath'))) {
               
-              MRTpath <- .normalizePath(MRTpath)
-              
               if (!file.exists(paste0(Sys.getenv('HOME'),'/.MRTpath'))) {
                 if (missing(MRTpath)) stop('MRTpath should be defined!')
                 if (!is.character(MRTpath)) stop('MRTpath should be a character!')
+                
+                MRTpath <- .normalizePath(MRTpath)
                 
                 file.create(paste0(Sys.getenv('HOME'),'/.MRTpath'))
                 f <- file(paste0(Sys.getenv('HOME'),'/.MRTpath'),'w')
@@ -659,6 +666,11 @@ setMethod("setMRTpath", "ANY",
                   b <- lapply(a,function(x) strsplit(x,':')[[1]])
                   b <- unlist(lapply(b,function(x) {if (x[1] == 'MRTpath' & x[2] == MRTpath) TRUE else FALSE}))
                   if (!b) {
+                    if (missing(MRTpath)) stop('MRTpath should be defined!')
+                    if (!is.character(MRTpath)) stop('MRTpath should be a character!')
+                    
+                    MRTpath <- .normalizePath(MRTpath)
+                    
                     f <- file(paste0(Sys.getenv('HOME'),'/.MRTpath'),'w')
                     cat(paste0("MRTpath:",MRTpath,"\n"),file=f)
                     close(f)
@@ -669,6 +681,9 @@ setMethod("setMRTpath", "ANY",
               if (echo) cat('MRTpath is successfully added!')
             } else if (update) {
               if (missing(MRTpath)) stop('MRTpath should be defined!')
+              if (!is.character(MRTpath)) stop('MRTpath should be a character!')
+              MRTpath <- .normalizePath(MRTpath)
+              
               file.create(paste0(Sys.getenv('HOME'),'/.MRTpath'))
               f <- file(paste0(Sys.getenv('HOME'),'/.MRTpath'),'w')
               cat(paste0("MRTpath:",MRTpath,"\n"),file=f)
@@ -682,7 +697,8 @@ setMethod("setMRTpath", "ANY",
             f <- file(paste0(Sys.getenv('HOME'),'/.MRTpath'),'r')
             a <- readLines(f)
             close(f)
-            if (length(a) > 0) .rtsOptions$addOption('MRTpath',lapply(a,function(x) strsplit(x,':')[[1]])[[1]][2])
+            #if (length(a) > 0) .rtsOptions$addOption('MRTpath',lapply(a,function(x) strsplit(x,':')[[1]])[[1]][2])
+            if (length(a) > 0) .rtsOptions$addOption('MRTpath', lapply(a, function(x) strsplit(x,'MRTpath:')[[1]])[[1]][2])
             
           }
 )
@@ -697,7 +713,7 @@ setMethod("mosaicHDF", "character",
               if (is.null(.rtsOptions$getOption('MRTpath'))) stop('MRTpath is not provided & is not set in the package; you can set it using setMRTpath only one time, and then everytime it can be used everywhere in the package!')
               else MRTpath <- .rtsOptions$getOption('MRTpath')
             } else {
-              setMRTpath(MRTpath)
+              setMRTpath(MRTpath,echo=FALSE)
               MRTpath <- .rtsOptions$getOption('MRTpath')
             }
             
@@ -734,7 +750,7 @@ setMethod("reprojectHDF", "character",
               if (is.null(.rtsOptions$getOption('MRTpath'))) stop('MRTpath is not provided & is not set in the package; you can set it using setMRTpath only one time, and then everytime it can be used everywhere in the package!')
               else MRTpath <- .rtsOptions$getOption('MRTpath')
             } else {
-              setMRTpath(MRTpath)
+              setMRTpath(MRTpath,echo=FALSE)
               MRTpath <- .rtsOptions$getOption('MRTpath')
             }
             
@@ -781,7 +797,7 @@ setMethod("getMODIS", "character",
             # Max amount of parallel downloads. If package parallel is not available use only 1
             if (requireNamespace('parallel', quietly = TRUE)) { 
               nc <- parallel::detectCores()
-              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(floor(nc/2),4)
+              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(nc,4)
               else if (is.numeric(ncore)) ncore <- min(nc,ncore)
               else ncore <- 1L
             } else { ncore <- 1L }
@@ -804,7 +820,7 @@ setMethod("getMODIS", "character",
             # getModisName to find it. In the parallel case it gets created in the global environment in the clusterEvalQ call
             # but if we call the same expression here it gets created in the current environment, thus we use assign
             #assign(".rtsOptions$getOption('MD_curlHandle')", RCurl::getCurlHandle(), envir = .GlobalEnv)
-            .._MD_curlHandle <<- RCurl::getCurlHandle()
+            #.._MD_curlHandle <<- RCurl::getCurlHandle()
             for (d in dirs) {
               dwnld <- rep(FALSE,length(Modislist[[d]]))
               cnt <- 1
@@ -840,7 +856,7 @@ setMethod("getMODIS", "numeric",
             
             if (requireNamespace('parallel', quietly = TRUE)) { 
               nc <- parallel::detectCores()
-              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(floor(nc/2),4)
+              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(nc,4)
               else if (is.numeric(ncore)) ncore <- min(nc,ncore)
               else ncore <- 1L
             } else { ncore <- 1L }
@@ -864,7 +880,7 @@ setMethod("getMODIS", "numeric",
             # getModisName to find it. In the parallel case it gets created in the global environment in the clusterEvalQ call
             # but if we call the same expression here it gets created in the current environment, thus we use assign
             #assign(".rtsOptions$getOption('MD_curlHandle')", RCurl::getCurlHandle(), envir = .GlobalEnv)
-            .._MD_curlHandle <<- RCurl::getCurlHandle()
+            #.._MD_curlHandle <<- RCurl::getCurlHandle()
             
             for (d in dirs) {
               dwnld <- rep(FALSE,length(Modislist[[d]]))
@@ -906,7 +922,7 @@ setMethod("ModisDownload", "character",
             
             
             if (!missing(MRTpath) && !is.null(MRTpath)) {
-              setMRTpath(MRTpath)
+              setMRTpath(MRTpath,echo=FALSE)
               MRTpath <- .rtsOptions$getOption('MRTpath')
               if (Sys.getenv('MRT_DATA_DIR') == '') {
                 Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
@@ -922,7 +938,7 @@ setMethod("ModisDownload", "character",
             
             if (requireNamespace('parallel', quietly = TRUE)) { 
               nc <- parallel::detectCores()
-              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(floor(nc/2),4)
+              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(nc,4)
               else if (is.numeric(ncore)) ncore <- min(nc,ncore)
               else ncore <- 1L
             } else { ncore <- 1L }
@@ -1000,7 +1016,7 @@ setMethod("ModisDownload", "numeric",
             }
             
             if (!missing(MRTpath) && !is.null(MRTpath)) {
-              setMRTpath(MRTpath)
+              setMRTpath(MRTpath,echo=FALSE)
               MRTpath <- .rtsOptions$getOption('MRTpath')
               if (Sys.getenv('MRT_DATA_DIR') == '') {
                 Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
@@ -1016,7 +1032,7 @@ setMethod("ModisDownload", "numeric",
             
             if (requireNamespace('parallel', quietly = TRUE)) { 
               nc <- parallel::detectCores()
-              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(floor(nc/2),4)
+              if (!missing(ncore) && is.character(ncore) && tolower(ncore) %in% c('auto','a','au')) ncore <- min(nc,4)
               else if (is.numeric(ncore)) ncore <- min(nc,ncore)
               else ncore <- 1L
             } else { ncore <- 1L }
