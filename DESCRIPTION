@@ -1,8 +1,8 @@
 Package: rts
 Type: Package
 Title: Raster Time Series Analysis
-Version: 1.0-45
-Date: 2018-03-17
+Version: 1.0-47
+Date: 2018-10-19
 Author: Babak Naimi
 Depends: methods, sp (>= 1.2-0), R (>= 3.0.0), raster, xts, zoo, RCurl
 Suggests: digest
@@ -11,6 +11,6 @@ Description: This framework aims to provide classes and methods for manipulating
 License: GPL (>= 3)
 URL: http://r-gis.net
 NeedsCompilation: no
-Packaged: 2018-03-17 23:54:40 UTC; bnaimi
+Packaged: 2018-10-19 17:09:58 UTC; babak
 Repository: CRAN
-Date/Publication: 2018-03-18 13:30:43 UTC
+Date/Publication: 2018-10-19 22:10:04 UTC

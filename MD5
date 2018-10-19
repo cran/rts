@@ -1,9 +1,10 @@
-91e2c06253877dafbaa25ab09add504b *DESCRIPTION
-0cc1579e8699bd8819c012db9418fa40 *NAMESPACE
+dd18c35afd197a335df1b1eea6407964 *DESCRIPTION
+b2581de65f8351d1a2484358ef4412fe *NAMESPACE
 5ed056e61f3d75b9d57f2d986beae9f4 *R/AAAClasses.R
 24f430233ee830b7da549b4f29297db0 *R/ModisDownload.R
+87fc6fd0cef6b97373f4995a68a90c7d *R/VHIdownload.R
 f83417f9f59b03346df2f7cf63d51655 *R/apply.R
-016aabb9a30ce3ff490f2855f4e87f36 *R/cellFrom.R
+59866ac4b832b270e1d7bafc4d992fe8 *R/cellFrom.R
 e040963b6506f4274e910fc3413259c8 *R/endpoints.R
 84f8d04f8241d09effe007674dc42cdc *R/extract.R
 090e1c21be6034d9a212fc74f30e8a42 *R/index.R
@@ -24,10 +25,11 @@ aa90b01000fc3cb7f6b20c6a833cc803 *inst/external/ndvi/ndvi.rts
 d7b0fc1f6a1286bd03b81358e2732566 *inst/external/r2.asc
 39886e72375e780aea0058e8d71889c6 *inst/external/r3.asc
 8ea0bf8f2dd9830907ef9137a07b4d75 *inst/external/r4.asc
-03e1a27bacc4b34212470588b18d1149 *man/ModisDownload.Rd
+f6bdaf3ad9edfcaa497d80a019c2ca28 *man/ModisDownload.Rd
 c2620f4ff36684dff925b7d9499dc441 *man/RasterStackBrick-class.Rd
+4ed855ef58b6f737e4b5b6537935bdcd *man/VHPdownload.Rd
 53a0d410ab678c307a05f561080d5297 *man/apply.monthly.Rd
-eff5f102bba1c38283f042aea4c0836c *man/cellFromXY.Rd
+04475fe3e432b35f698cf8d2849d5fe2 *man/cellFromXY.Rd
 1f1345cff6db4b9c9254a85064fa8b8a *man/endpoints.Rd
 6f7987fc12a8fc8d3384117870365787 *man/extract.Rd
 29c1817f91b725f0bd354b0208455d53 *man/extractIndex.Rd
