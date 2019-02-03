@@ -1,10 +1,10 @@
-dd18c35afd197a335df1b1eea6407964 *DESCRIPTION
+fb14bf5f05e1c7b34e510abe5a6f0fcb *DESCRIPTION
 b2581de65f8351d1a2484358ef4412fe *NAMESPACE
 5ed056e61f3d75b9d57f2d986beae9f4 *R/AAAClasses.R
 24f430233ee830b7da549b4f29297db0 *R/ModisDownload.R
 87fc6fd0cef6b97373f4995a68a90c7d *R/VHIdownload.R
 f83417f9f59b03346df2f7cf63d51655 *R/apply.R
-59866ac4b832b270e1d7bafc4d992fe8 *R/cellFrom.R
+538272ce7727af29edffe57c53d96345 *R/cellFrom.R
 e040963b6506f4274e910fc3413259c8 *R/endpoints.R
 84f8d04f8241d09effe007674dc42cdc *R/extract.R
 090e1c21be6034d9a212fc74f30e8a42 *R/index.R
@@ -17,7 +17,7 @@ ebfe6f5f26f2767195f10b965df93ffa *R/period.R
 a1f67c1ad5cb7938251ff620e50cdc03 *R/zzz.R
 05ec22f32f1b914cd9050dc5115c2123 *inst/external/ModisLP.RData
 3db74d220abd0e2cba2d72e569140946 *inst/external/ModisLPV5.rds
-6e83a7f032eca9abe1836df14704100e *inst/external/ModisLPV6.rds
+7351540b6ba9a19061f752ef44801d00 *inst/external/ModisLPV6.rds
 fb550acefc6287c3f32df4b1c30865eb *inst/external/ndvi/ndvi.grd
 741359c0639d149ff24c6f6123f24388 *inst/external/ndvi/ndvi.gri
 aa90b01000fc3cb7f6b20c6a833cc803 *inst/external/ndvi/ndvi.rts
@@ -29,7 +29,7 @@ f6bdaf3ad9edfcaa497d80a019c2ca28 *man/ModisDownload.Rd
 c2620f4ff36684dff925b7d9499dc441 *man/RasterStackBrick-class.Rd
 4ed855ef58b6f737e4b5b6537935bdcd *man/VHPdownload.Rd
 53a0d410ab678c307a05f561080d5297 *man/apply.monthly.Rd
-04475fe3e432b35f698cf8d2849d5fe2 *man/cellFromXY.Rd
+51801d0247ad18cb6d42e13f034093d2 *man/cellFromXY.Rd
 1f1345cff6db4b9c9254a85064fa8b8a *man/endpoints.Rd
 6f7987fc12a8fc8d3384117870365787 *man/extract.Rd
 29c1817f91b725f0bd354b0208455d53 *man/extractIndex.Rd
