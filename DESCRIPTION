@@ -1,16 +1,18 @@
 Package: rts
 Type: Package
 Title: Raster Time Series Analysis
-Version: 1.0-49
-Date: 2019-02-01
+Version: 1.1-3
+Date: 2021-10-16
 Author: Babak Naimi
-Depends: methods, sp (>= 1.2-0), R (>= 3.0.0), raster, xts, zoo, RCurl
-Suggests: digest
+Depends: R (>= 3.5.0), terra, xts
+Imports: methods, sp (>= 1.4.1), zoo, RCurl, raster
+Suggests: digest, R.rsp
 Maintainer: Babak Naimi <naimi.b@gmail.com>
 Description: This framework aims to provide classes and methods for manipulating and processing of raster time series data (e.g. a time series of satellite images).
 License: GPL (>= 3)
 URL: http://r-gis.net
+VignetteBuilder: R.rsp
 NeedsCompilation: no
-Packaged: 2019-02-03 22:12:31 UTC; babak
+Packaged: 2021-10-16 19:17:06 UTC; babak
 Repository: CRAN
-Date/Publication: 2019-02-03 22:40:03 UTC
+Date/Publication: 2021-10-16 20:00:02 UTC

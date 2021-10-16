@@ -33,11 +33,11 @@ setMRTpath(MRTpath,update,...)
 
 ModisDownload(x,h,v,dates, ...)
 
-getMODIS(x,h,v,dates,version='005',forceReDownload=TRUE,ncore='auto')
+getMODIS(x,h,v,dates,version='006',forceReDownload=TRUE,ncore='auto')
 
 mosaicHDF(hdfNames,filename,MRTpath,bands_subset,delete=FALSE)
 
-reprojectHDF(hdfName,filename,MRTpath,...)
+reprojectHDF(hdfName,crs,subset,resample_method,filename,...)
 
 modisProducts(version=NULL)
 
@@ -55,10 +55,13 @@ getNativeTemporalResolution(product)
   \item{v}{ see the above descriptopn for \code{h} }
   \item{dates}{ a character vector with the length of one or two, specifiying an individual date or a range of dates as the form of \code{c(from, to)}}
   \item{hdfName}{the name of hdf file}
+  \item{crs}{coordinate reference system definiation (or a SpatRaster defines definition of new Raster for resampling)}
+  \item{subset}{integer vector specifies the layer number for subsetting bands}
+  \item{resample_method}{resample method for reprojection based on GDAL, can be one of "near","bilinear","cubic",or "cubicspline" (default: "near")}
   \item{hdfNames}{the names of hdf files}
   \item{MRTpath}{Path to the bin folder into the installed directory of MRT software. It is needed only if you need to mosaic and/or reproject the images. Example: MRTpath="d:/MRT/bin"}
   \item{filename}{ the name of new file}
-  \item{version}{ the product version. The default value is '005'}
+  \item{version}{ the product version. The default value is '006'}
   \item{bands_subset}{HDF-EOS input files contain several layers of data (bands). Through this argument you ca select a subset of bands. You need to know how many bands the product has, and which bands you want to be subset. Example: Suppose your image has 6 bands and you only need the second band. The parameter should be entered as: bands_subset="0 1 0 0 0 0".}
   \item{delete}{ Logical. If \code{TRUE}, the original HDF files will be deleted after mosaic or reproject into new files.}
   \item{forceReDownload}{logical, specify whether the product should be re-downloaded if it had been downloaded before. The downloaded products are cashed using a hash digest of the inputs. If the download is canceled mid-way and the same exact products are downloaded again, it can be useful to avoid re-downloading them.}
@@ -77,7 +80,7 @@ getNativeTemporalResolution(product)
   
   - \code{LR}: Optional. Lower right coordinate(x,y). Only if you want to spatially subset your images.
   
-  - \code{resample_type}: Resampling kernel type ("CUBIC_CONVOLUTION", "NEAREST_NEIGHBOR", or "BILINEAR"). The default is "NEAREST_NEIGHBOR".
+  - \code{resample_type}: Resampling kernel type for MRT ("CUBIC_CONVOLUTION", "NEAREST_NEIGHBOR", or "BILINEAR"). The default is "NEAREST_NEIGHBOR".
   
   - \code{proj_type}: Output projection short name. Valid values are "AEA" (Albers EqualArea), "ER" (Equirectangular), "GEO" (Geographic), "IGH" (Interrupted Goode Homolosine), "HAM" (Hammer), "ISIN" (Integerized Sinusoidal), "LA" (Lambert Azimuthal Equal Area), "LCC" (Lambert Conformal Conic), "MERCAT" (Mercator), "MOL" (Molleweide), "PS" (Polar Stereographic), "SIN" (Sinusoidal), "TM" (Transverse Mercator), and "UTM" (Universal Transverse Mercator).
   
@@ -135,23 +138,23 @@ modisProducts(version=NULL) # both versions
 
 # Following command only downloads the source HDF images, no mosaic and no projection
 
-ModisDownload(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01',mosaic=F,proj=F)
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01',mosaic=F,proj=F,version='006')
 
  
-# alternatively, you can use modisHDF to download only HDF images:
+# alternatively, you can use getMODIS to download only HDF images:
 
-modisHDF(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01')
+getMODIS(x=x,h=c(17,18),v=c(4,5),dates='2011.05.01',version='006')
 
 # same as the above command, but downloads all available images in 2011:
 
-ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.01.01','2011.12.31'))
+ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.01.01','2011.12.31'),version='006')
 
 #------
 
 # Downloads selected tiles, and mosaic them, but no projections:
 
 ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),
-              MRTpath='d:/MRT/bin',mosaic=T,proj=F)
+              MRTpath='d:/MRT/bin',mosaic=T,proj=F,version='006')
 
 #--- alternatively, you can first download the HDF images using getMODIS, 
 #and then mosaic them using mosaicHDF!
@@ -160,7 +163,8 @@ ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),
 #convert all bands into Geotif format (the original HDF will be deleted!):
 
 ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
-              mosaic=T,proj=T,proj_type="UTM",utm_zone=30,datum="WGS84",pixel_size=1000)
+              mosaic=T,proj=T,proj_type="UTM",utm_zone=30,datum="WGS84",
+              pixel_size=1000,version='006')
 
 # Same as above command, but only second band out of 6 bands will be kept. (You do not need 
 #to specify proj_params when "UTM" is selected as proj_type and the zone also is specified,
@@ -169,7 +173,7 @@ ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath
 ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath='d:/MRT/bin',
               mosaic=T,proj=T, bands_subset="0 1 0 0 0 0", proj_type="UTM",
               proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,
-              datum="WGS84",pixel_size=1000)
+              datum="WGS84",pixel_size=1000,version='006')
 
  
 # Same as above command, but it spatially subsets the images into the specified box (UL and LR):
@@ -178,11 +182,11 @@ ModisDownload(x=x,h=c(17,18),v=c(4,5),dates=c('2011.05.01','2011.05.31'),MRTpath
              mosaic=T,proj=T,UL=c(-42841.0,4871530.0),LR=c(1026104,3983860), 
              bands_subset="0 1 0 0 0 0", proj_type="UTM",
              proj_params="-3 0 0 0 0 0 0 0 0 0 0 0 0 0 0",utm_zone=30,datum="WGS84",
-             pixel_size=1000)
+             pixel_size=1000,version='006')
 
 
 }
 
 }
 
-\keyword{ utilities }
+\keyword{ spatial }

@@ -1,5 +1,5 @@
 # Title:  ModisDownload 
-# Version: 7.3 (last update): March 2018
+# Version: 7.5 (last update): Oct. 2021
 # Author: Babak Naimi (naimi.b@gmail.com), and (from version 5.4) Pablo Alfaro (ludecan@gmail.com)
 
 # Major changes have been made on this version comparing to the 2.x. Since the FTP is not supported anymore,
@@ -422,7 +422,7 @@ getNativeTemporalResolution <- function(product) {
   return(success)
 }
 
-.getMODIS <- function(x, h, v, dates, version='005',opt, forceReDownload=TRUE,nc) {
+.getMODIS <- function(x, h, v, dates, version='006',opt, forceReDownload=TRUE,nc) {
   xx <- .modisHTTP(x,v=version,opt=opt)
   Modislist <- .getModisList(x = xx,h=h,v=v,dates=dates,opt=opt, forceReDownload=forceReDownload,nc=nc)
   
@@ -543,7 +543,7 @@ if (!isGeneric("setMRTpath")) {
 }
 
 if (!isGeneric("getMODIS")) {
-  setGeneric("getMODIS", function(x,h,v,dates,version='005',forceReDownload=TRUE,ncore='auto')
+  setGeneric("getMODIS", function(x,h,v,dates,version='006',forceReDownload=TRUE,ncore='auto')
     standardGeneric("getMODIS"))
 }
 
@@ -551,8 +551,10 @@ if (!isGeneric("mosaicHDF")) {
   setGeneric("mosaicHDF", function(hdfNames,filename,MRTpath, bands_subset,delete=FALSE)
     standardGeneric("mosaicHDF"))
 }
+
+
 if (!isGeneric("reprojectHDF")) {
-  setGeneric("reprojectHDF", function(hdfName,filename,MRTpath, ...)
+  setGeneric("reprojectHDF", function(hdfName,crs,subset,resample_method,filename, ...)
     standardGeneric("reprojectHDF"))
 }
 
@@ -742,50 +744,95 @@ setMethod("mosaicHDF", "character",
 )
 
 
+.reprojectHDF <- function(hdfName,filename,MRTpath,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM',
+                          bands_subset='',proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size=1000) {
+  
+  if (missing(MRTpath)) {
+    if (is.null(.rtsOptions$getOption('MRTpath'))) stop('MRTpath is not provided & is not set in the package; you can set it using setMRTpath only one time, and then everytime it can be used everywhere in the package!')
+    else MRTpath <- .rtsOptions$getOption('MRTpath')
+  } else {
+    setMRTpath(MRTpath,echo=FALSE)
+    MRTpath <- .rtsOptions$getOption('MRTpath')
+  }
+  
+  if (Sys.getenv('MRT_DATA_DIR') == '') {
+    Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
+  }
+  
+  fname = file('tmp.prm', open="wt")
+  write(paste('INPUT_FILENAME = ', getwd(), '/',hdfName, sep=""), fname) 
+  if (bands_subset != '') {
+    write(paste('SPECTRAL_SUBSET = ( ',bands_subset,' )',sep=''),fname,append=TRUE)
+  }
+  if (UL[1] != '' & LR[1] != '') {
+    write('SPATIAL_SUBSET_TYPE = OUTPUT_PROJ_COORDS', fname, append=TRUE)
+    write(paste('SPATIAL_SUBSET_UL_CORNER = ( ', as.character(UL[1]),' ',as.character(UL[2]),' )',sep=''), fname, append=TRUE)
+    write(paste('SPATIAL_SUBSET_LR_CORNER = ( ', as.character(LR[1]),' ',as.character(LR[2]),' )',sep=''), fname, append=TRUE)
+  }
+  write(paste('OUTPUT_FILENAME = ', filename, sep=""), fname, append=TRUE)
+  write(paste('RESAMPLING_TYPE = ',resample_type,sep=''), fname, append=TRUE)
+  write(paste('OUTPUT_PROJECTION_TYPE = ',proj_type,sep=''), fname, append=TRUE)
+  write(paste('OUTPUT_PROJECTION_PARAMETERS = ( ',proj_params,' )',sep=''), fname, append=TRUE)
+  write(paste('DATUM = ',datum,sep=''), fname, append=TRUE)
+  if (proj_type == 'UTM') write(paste('UTM_ZONE = ',utm_zone,sep=''), fname, append=TRUE)
+  write(paste('OUTPUT_PIXEL_SIZE = ',as.character(pixel_size),sep=''), fname, append=TRUE)
+  close(fname)
+  e <- system(paste(MRTpath, '/resample -p ',getwd(),'/','tmp.prm', sep=''))
+  if (e == 0) return (TRUE)
+  else return(FALSE)
+}
+
+
 setMethod("reprojectHDF", "character",
-          function(hdfName,filename,MRTpath,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM',
-                   bands_subset='',proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size=1000) {
+          function(hdfName,crs,subset,resample_method='near',filename,verbose=TRUE,...) {
+            if (!file.exists(hdfName[1])) stop('specified file (hdfName) does not exist!')
+            if (length(hdfName) > 1) {
+              warning('Only the first hdfName is used...!')
+              hdfName <- hdfName[1]
+            }
             
-            if (missing(MRTpath)) {
-              if (is.null(.rtsOptions$getOption('MRTpath'))) stop('MRTpath is not provided & is not set in the package; you can set it using setMRTpath only one time, and then everytime it can be used everywhere in the package!')
-              else MRTpath <- .rtsOptions$getOption('MRTpath')
+            if (missing(filename)) filename <- ""
+            
+            r <- try(rast(hdfName),TRUE)
+            
+            if (inherits(r,'try-error')) stop('It seems that the file(s) cannot be read, make sure that GDAL installation on your machine supports HDF format!')
+            
+            j <- nlyr(r)
+            
+            if (!missing(subset)) j <- c(1:j)[subset]
+            else j <- NULL
+            
+            if (missing(verbose)) verbose <- TRUE
+            
+            if (missing(resample_method)) resample_method <- 'near'
+            else {
+              if (!resample_method[1] %in% c('near','bilinear','cubic','cubicspline')) {
+                warning("resample_method is uknown; should be one of ['near','bilinear','cubic','cubicspline']; default ('near') is used!")
+                resample_method <- 'near' 
+              } else resample_method <- resample_method[1]
+            }
+            
+            if (missing(crs)) {
+              if (verbose) cat('crs (coordinate reference system) is set to:',"+proj=longlat +datum=WGS84")
+              else {
+                warning('crs (coordinate reference system) is not specified; the default "+proj=longlat +datum=WGS84" is used!')
+              }
+              crs <- "+proj=longlat +datum=WGS84"
+            }
+            #--------
+            if (!is.null(j)){
+              r <- project(r[[j]],crs,method=resample_method,filename=filename,...)
             } else {
-              setMRTpath(MRTpath,echo=FALSE)
-              MRTpath <- .rtsOptions$getOption('MRTpath')
+              r <- project(r,crs,method=resample_method,filename=filename,...)
             }
             
-            if (Sys.getenv('MRT_DATA_DIR') == '') {
-              Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
-            }
-            
-            fname = file('tmp.prm', open="wt")
-            write(paste('INPUT_FILENAME = ', getwd(), '/',hdfName, sep=""), fname) 
-            if (bands_subset != '') {
-              write(paste('SPECTRAL_SUBSET = ( ',bands_subset,' )',sep=''),fname,append=TRUE)
-            }
-            if (UL[1] != '' & LR[1] != '') {
-              write('SPATIAL_SUBSET_TYPE = OUTPUT_PROJ_COORDS', fname, append=TRUE)
-              write(paste('SPATIAL_SUBSET_UL_CORNER = ( ', as.character(UL[1]),' ',as.character(UL[2]),' )',sep=''), fname, append=TRUE)
-              write(paste('SPATIAL_SUBSET_LR_CORNER = ( ', as.character(LR[1]),' ',as.character(LR[2]),' )',sep=''), fname, append=TRUE)
-            }
-            write(paste('OUTPUT_FILENAME = ', filename, sep=""), fname, append=TRUE)
-            write(paste('RESAMPLING_TYPE = ',resample_type,sep=''), fname, append=TRUE)
-            write(paste('OUTPUT_PROJECTION_TYPE = ',proj_type,sep=''), fname, append=TRUE)
-            write(paste('OUTPUT_PROJECTION_PARAMETERS = ( ',proj_params,' )',sep=''), fname, append=TRUE)
-            write(paste('DATUM = ',datum,sep=''), fname, append=TRUE)
-            if (proj_type == 'UTM') write(paste('UTM_ZONE = ',utm_zone,sep=''), fname, append=TRUE)
-            write(paste('OUTPUT_PIXEL_SIZE = ',as.character(pixel_size),sep=''), fname, append=TRUE)
-            close(fname)
-            e <- system(paste(MRTpath, '/resample -p ',getwd(),'/','tmp.prm', sep=''))
-            if (e == 0) return (TRUE)
-            else return(FALSE)
+            r
           }
-          
 )
 
 
 setMethod("getMODIS", "character",
-          function(x,h,v,dates,version='005',forceReDownload=TRUE,ncore='auto') {
+          function(x,h,v,dates,version='006',forceReDownload=TRUE,ncore='auto') {
             if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
             else {
               opt <- .rtsOptions$getOption(n = 'nasaAuth')
@@ -845,7 +892,7 @@ setMethod("getMODIS", "character",
 
 
 setMethod("getMODIS", "numeric",
-          function(x,h,v,dates,version='005',forceReDownload=TRUE,ncore='auto') {
+          function(x,h,v,dates,version='006',forceReDownload=TRUE,ncore='auto') {
             if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
             else {
               opt <- .rtsOptions$getOption(n = 'nasaAuth')
@@ -865,6 +912,8 @@ setMethod("getMODIS", "numeric",
               ncore <- 4
               warning('ncore is set to 4 (cannot be greater...!)')
             }
+            
+            if (missing(version)) version <- '006'
             
             xx <- .modisHTTP(x,v=version,opt=opt)
             Modislist <- .getModisList(xx,h=h,v=v,dates=dates,opt=opt,forceReDownload=forceReDownload,nc=ncore)
@@ -910,7 +959,7 @@ setMethod("getMODIS", "numeric",
 
 
 setMethod("ModisDownload", "character",
-          function(x,h,v,dates,version='005',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size=getNativePixelSize(x),forceReDownload=TRUE,ncore='auto') {
+          function(x,h,v,dates,version='006',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size=getNativePixelSize(x),forceReDownload=TRUE,ncore='auto') {
             
             if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
             else {
@@ -920,6 +969,7 @@ setMethod("ModisDownload", "character",
                                         followlocation=TRUE)
             }
             
+            if (missing(version)) version <- '006'
             
             if (!missing(MRTpath) && !is.null(MRTpath)) {
               setMRTpath(MRTpath,echo=FALSE)
@@ -930,10 +980,13 @@ setMethod("ModisDownload", "character",
             } else {
               if (!is.null(.rtsOptions$getOption('MRTpath'))) {
                 MRTpath <- .rtsOptions$getOption('MRTpath')
-              }
-              if (Sys.getenv('MRT_DATA_DIR') == '') {
-                Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
-              }
+                
+                if (Sys.getenv('MRT_DATA_DIR') == '') {
+                  Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
+                }
+                
+              } else MRTpath <- NULL
+              
             }
             
             if (requireNamespace('parallel', quietly = TRUE)) { 
@@ -994,7 +1047,7 @@ setMethod("ModisDownload", "character",
                   pref <- paste(pref[1],"_",pref[3],sep="")
                   d <- dHDF[i,1]
                   date_name <- sub(sub(pattern="\\.", replacement="-", d), pattern="\\.", replacement="-", d)
-                  e <- reprojectHDF(ModisName,filename=paste(pref,'_',date_name,'.tif',sep=''),MRTpath=MRTpath,UL=UL,LR=LR,bands_subset=bands_subset,proj_type=proj_type,proj_params=proj_params,utm_zone=utm_zone,pixel_size=pixel_size)
+                  e <- .reprojectHDF(ModisName,filename=paste(pref,'_',date_name,'.tif',sep=''),MRTpath=MRTpath,UL=UL,LR=LR,bands_subset=bands_subset,proj_type=proj_type,proj_params=proj_params,utm_zone=utm_zone,pixel_size=pixel_size)
                   if (e & delete) unlink(paste(ModisName))
                   if (!e) warning (paste("The procedure has failed to REPROJECT the individual HDF image ",ModisName,"!",sep=""))
                 }
@@ -1006,7 +1059,7 @@ setMethod("ModisDownload", "character",
 
 
 setMethod("ModisDownload", "numeric",
-          function(x,h,v,dates,version='005',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size,forceReDownload=TRUE,ncore='auto') {
+          function(x,h,v,dates,version='006',MRTpath,mosaic=FALSE,bands_subset='',delete=FALSE,proj=FALSE,UL="",LR="",resample_type='NEAREST_NEIGHBOR',proj_type='UTM', proj_params='0 0 0 0 0 0 0 0 0 0 0 0',datum='WGS84',utm_zone=NA,pixel_size,forceReDownload=TRUE,ncore='auto') {
             if (is.null(.rtsOptions$getOption(n = 'nasaAuth'))) stop('Downloading these data requires a NASA Earthdata Login username and password. \n To obtain a NASA Earthdata Login account, please visit: https://urs.earthdata.nasa.gov/users/new/.\n When you get your username and password, then use the setNASAauth function (only first time) to set the username and password on this machine')
             else {
               opt <- .rtsOptions$getOption(n = 'nasaAuth')
@@ -1024,11 +1077,14 @@ setMethod("ModisDownload", "numeric",
             } else {
               if (!is.null(.rtsOptions$getOption('MRTpath'))) {
                 MRTpath <- .rtsOptions$getOption('MRTpath')
-              }
-              if (Sys.getenv('MRT_DATA_DIR') == '') {
-                Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
-              }
+                
+                if (Sys.getenv('MRT_DATA_DIR') == '') {
+                  Sys.setenv(MRT_DATA_DIR=.getMRTdata(MRTpath))
+                }
+              } else MRTpath <- NULL
             }
+            
+            if (missing(version)) version <- '006'
             
             if (requireNamespace('parallel', quietly = TRUE)) { 
               nc <- parallel::detectCores()
