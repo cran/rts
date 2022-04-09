@@ -110,7 +110,7 @@ getNativeTemporalResolution <- function(product) {
 }
 #-----------------------
 
-.modisHTTP <- function(x,v='005',opt) {
+.modisHTTP <- function(x,v='006',opt) {
   if (!requireNamespace("RCurl",quietly = TRUE)) stop("Package RCurl is not installed")
   mp <- modisProducts(version=v)
   if (is.numeric(x)) {
