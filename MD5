@@ -1,7 +1,7 @@
-d0eb453c531eb84baa65f29ca53f5e16 *DESCRIPTION
+59434bd236e43d21599d5f4ff86eec78 *DESCRIPTION
 1a28c216090fafc539e2f2d45948949a *NAMESPACE
 8e3727b919a29015127dfd1254752832 *R/AAAClasses.R
-c41c118ae2d9f88b17607fe25a456090 *R/ModisDownload.R
+fa12405fda506f7dee074e5892245f06 *R/ModisDownload.R
 b996226bbd3a9fdeb5afde5da91b4d68 *R/VHIdownload.R
 c4736020765319f82d1989dc775c35bf *R/apply.R
 493874e34902fe470346c2e47fc91750 *R/cellFrom.R
@@ -13,12 +13,12 @@ c4736020765319f82d1989dc775c35bf *R/apply.R
 b35cbc8ee839b16439ac547027946bf9 *R/rts.R
 1517fef54b4d8299b88ca5f0a1e15a92 *R/show.R
 998337e3f08df9267673fdd9a978ef3c *R/subset.R
-8c716c8684b4de27b337d914405ec0c4 *R/utils.R
-f9891fab167b1c699e4f88c61b2170ba *R/writerts.R
+e1d68998cde74336e1371eab847ca916 *R/utils.R
+0de26b797865a4b923445e71975be46d *R/writerts.R
 a1f67c1ad5cb7938251ff620e50cdc03 *R/zzz.R
-e15a8c4d2e75c804f258e615e4587c57 *build/vignette.rds
+12d060dd0d4764ded250eb9ea7d6eb91 *build/vignette.rds
 dc04b6a6e4f6e58ced75b1103d0130c5 *inst/doc/rts.pdf
-c6faf2b99df29fa4d553d45845e70869 *inst/doc/rts.pdf.asis
+8792b0c575f0eae58f69616d87899335 *inst/doc/rts.pdf.asis
 05ec22f32f1b914cd9050dc5115c2123 *inst/external/ModisLP.RData
 3db74d220abd0e2cba2d72e569140946 *inst/external/ModisLPV5.rds
 7351540b6ba9a19061f752ef44801d00 *inst/external/ModisLPV6.rds
@@ -45,4 +45,4 @@ e0505f60634f4947c732c91818194665 *man/rts.Rd
 e9a8213d12692ababed9fc27357aeaf4 *man/subset.Rd
 15ee767a1cca088a2a2cfbabefa66c6d *man/subsetIndex.Rd
 da464c6812dd9fd6f9ee744375dc7b12 *man/write.rts.Rd
-c6faf2b99df29fa4d553d45845e70869 *vignettes/rts.pdf.asis
+8792b0c575f0eae58f69616d87899335 *vignettes/rts.pdf.asis
