@@ -62,7 +62,7 @@ the \pkg{xts} package.
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[rts]{extract}} and \code{\link[xts]{[.xts}}}

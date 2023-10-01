@@ -63,7 +63,7 @@ An \code{rts} object.
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{\code{\link[xts]{[.xts}} and \code{\link[raster]{extract}}}

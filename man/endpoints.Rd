@@ -42,7 +42,7 @@ A numeric vector of endpoints beginning with 0 and ending with a value equal to 
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[xts]{endpoints}}}

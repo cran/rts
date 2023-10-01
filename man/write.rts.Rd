@@ -39,7 +39,7 @@ This function is used for writing values to a series of files.
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[rts]{read.rts}}, \code{\link[raster]{writeRaster}}}

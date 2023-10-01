@@ -33,7 +33,7 @@ By default, the Raster Time Series is read as the class of \code{SpatRasterTS}, 
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[rts]{write.rts}, \link[rts]{rts}}}

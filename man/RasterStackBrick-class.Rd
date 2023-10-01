@@ -40,7 +40,7 @@ See also \code{\link[raster]{Raster-class}} for slots in \code{raster}.
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \examples{

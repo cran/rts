@@ -1,8 +1,8 @@
-# Author: Babak Naimi, naimi.b@gmail.com
+# Author: Babak Naimi, naimi.b@gmail.com (Thanks Robert Hijman for modifying the code)
 # This is based on 'show' function from raster package 
 # Date :  November 2012
-# Last Update :  Sep. 2022
-# Version 1.4
+# Last Update :  Sep. 2023
+# Version 1.5
 # Licence GPL v3
 
 setMethod ('show' , 'RasterStackBrickTS',
@@ -63,9 +63,11 @@ setMethod ('show' , 'SpatRasterTS',
              } 
              cat ('class       :' , class ( object ) , '\n')
              
-             if (length(object@raster@ptr$filenames()[object@raster@ptr$filenames() != '']) > 0) {
-               if (length(object@raster@ptr$filenames()) > 3) cat ('raster filename    :' , paste(object@raster@ptr$filenames()[1:3],collapse=', '),'...', '\n')
-               else cat ('raster filename    :' , object@raster@ptr$filenames(), '\n')
+             fnames <- sources(object@raster)
+			 
+             if (length(fnames[fnames != '']) > 0) {
+               if (length(fnames) > 3) cat ('raster filename    :' , paste(fnames[1:3],collapse=', '),'...', '\n')
+               else cat ('raster filename    :' , fnames, '\n')
              }
              nl <- nlyr(object@raster)
              if (nl == 0) {
@@ -93,8 +95,9 @@ setMethod ('show' , 'SpatRasterTS',
                
                cat ('coord. ref. :' , .name_or_proj4(object@raster), '\n')
                
-               minv <- format(object@raster@ptr$range_min, digits=2)
-               maxv <- format(object@raster@ptr$range_max, digits=2)
+			   rng <- minmax(object@raster)
+               minv <- format(rng[1,], digits=2)
+               maxv <- format(rng[2,], digits=2)
                minv <- gsub('Inf', '?', minv)
                maxv <- gsub('-Inf', '?', maxv)
                if (nl > 10) {

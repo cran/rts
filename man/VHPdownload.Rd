@@ -43,7 +43,7 @@ Data arrays are in geographic projection (grid with equal latitude and longitude
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 

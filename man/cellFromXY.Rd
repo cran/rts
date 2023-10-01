@@ -44,7 +44,7 @@ row, column or cell number(s). cellFromLine and cellFromPolygon return a list.
 
 \author{Babak Naimi
 \email{naimi.b@gmail.com}
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 

@@ -109,7 +109,7 @@ The functions \code{ModisDownload} uses the functions including  \code{getMODIS}
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 

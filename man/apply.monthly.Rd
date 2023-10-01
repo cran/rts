@@ -49,7 +49,7 @@ A raster time series (\code{Raster*TS}) object
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[rts]{endpoints}}, \code{\link[rts]{period.apply}},

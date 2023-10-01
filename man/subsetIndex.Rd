@@ -36,7 +36,7 @@ This function can be used to extract a raster layer or a set of raster lasyers b
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[rts]{subset}}}

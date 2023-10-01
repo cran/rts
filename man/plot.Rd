@@ -52,7 +52,7 @@ CCYYMMDD HH:MM:SS.ss+/CCYYMMDD HH:MM:SS.ss
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[raster]{plot}}, \code{\link[rts]{extract}}, \code{\link[rts]{subset}}}

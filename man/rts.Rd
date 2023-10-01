@@ -44,7 +44,7 @@ Babak Naimi
 
 \email{naimi.b@gmail.com}
 
-\url{http://r-gis.net}
+\url{https://r-gis.net/}
 }
 
 \seealso{ \code{\link[raster]{stack}, \link[raster]{brick}, \link[xts]{xts}}}
@@ -58,7 +58,7 @@ lst <- list.files(path=path,pattern='.asc$',full.names=TRUE)
 lst # list of raster files
 
 
-r <- stack(lst) # creating a RasterStack object
+r <- rast(lst) # creating a RasterStack object
 
 r
 
